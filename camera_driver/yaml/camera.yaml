@@ -1,0 +1,12 @@
+camera_driver_node:
+  ros__parameters:
+    camera_height: 540
+    camera_width: 720
+    camera_exp: 4500.0
+    camera_gain: 15.0
+    camera_framerate: 200
+    camera1:
+      camera_name: camera1
+    camera2:
+      camera_name: camera2
+    camera_name: camera
