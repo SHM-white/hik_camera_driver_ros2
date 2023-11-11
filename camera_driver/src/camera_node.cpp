@@ -603,6 +603,10 @@ int main(int argc, char **argv)
             {
                 printf("No data! nRet [0x%x], time to restart %d\n", nRet, node->restart_flag);
                 node->restart_flag--;
+                if(node->restart_flag <= 0)
+                {
+                    break;
+                }
             }
             nRet = node->free_image_buffer();
             if(nRet != MV_OK)

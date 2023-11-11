@@ -20,6 +20,7 @@ def generate_launch_description():
         emulate_tty=True,
         parameters=[yaml_path],
         name="camera_driver_node",
+        respawn=True
     )
     # 创建LaunchDescription对象launch_description,用于描述launch文件
     launch_description = LaunchDescription(
