@@ -1,4 +1,3 @@
-
 #include "rclcpp/rclcpp.hpp"
 #include "stdio.h"
 #include "string.h"
@@ -17,11 +16,7 @@ class CameraNode : public rclcpp::Node
 {
 
 public:
-    /*!
-     * 打印相机信息
-     * @param pstMVDevInfo
-     * @return
-     */
+    //打印相机信息
     bool PrintDeviceInfo(MV_CC_DEVICE_INFO* pstMVDevInfo)
     {
         if (NULL == pstMVDevInfo)
@@ -51,16 +46,7 @@ public:
         }
         return true;
     }
-    /*!
-     * 从相机内部获取参数，如果与要求不一致，则进行修改
-     * @param pHandle 相机句柄
-     * @param width 宽度
-     * @param height 高度
-     * @param framerate 帧率
-     * @param exp 曝光时间，单位us
-     * @param gain 增益，单位db
-     * @return 修改状态
-     */
+    //从相机内部获取参数，如果与要求不一致，则进行修改
     int getAndSetCameraParam()
     {
         int nRet = MV_OK;

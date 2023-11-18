@@ -53,5 +53,5 @@ install(TARGETS
         camera_driver_node
         DESTINATION lib/${PROJECT_NAME}
 )
-install(DIRECTORY launch
+install(DIRECTORY launch yaml
         DESTINATION share/${PROJECT_NAME})

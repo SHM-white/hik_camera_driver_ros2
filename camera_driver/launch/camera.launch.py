@@ -9,7 +9,6 @@ def generate_launch_description():
     #定义yaml_path为yaml文件路径
     yaml_path = os.path.join(
         get_package_share_directory('camera_driver'),
-        '../../../../src/hik_camera_driver_ros2/camera_driver/' #我觉得这有很大问题，但我没有更好的办法
         'yaml',
         'camera.yaml'
     )
