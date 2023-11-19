@@ -23,6 +23,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 include_directories(
         /opt/MVS/include/
+        include
 )
 
 if(BUILD_TESTING)

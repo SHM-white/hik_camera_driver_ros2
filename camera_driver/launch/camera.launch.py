@@ -16,10 +16,11 @@ def generate_launch_description():
         package="camera_driver",
         executable="camera_driver_node",
         output="screen",
-        emulate_tty=True,
+        emulate_tty=True, #用来保证printf可以打印
         parameters=[yaml_path],
         name="camera_driver_node",
-        respawn=True
+        respawn=False,
+        namespace="camera1" #一定要注明命名空间，否则无法读入参数
     )
     # 创建LaunchDescription对象launch_description,用于描述launch文件
     launch_description = LaunchDescription(
