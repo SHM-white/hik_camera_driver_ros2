@@ -1,7 +1,7 @@
 camera1: #与命名空间对应，使用的命名空间决定了读入的参数
   camera_driver_node:
     ros__parameters:
-      camera_name: camera1
+      camera_name: camera1 #相机名称，用于区分不同相机，从相机客户端中修改
       camera_height: 1080 #使用裁剪实现的，数值大小会影响相机视野
       camera_width: 1440 #使用裁剪实现的，数值大小会影响相机视野
       camera_exp: 4500.0 #曝光时间，曝光时间与帧率尽量匹配
@@ -16,13 +16,21 @@ camera1: #与命名空间对应，使用的命名空间决定了读入的参数
       camera_auto_maxgain: 17.0 #自动增益的最大值
       camera_auto_mingain: 0.0 #自动增益的最小值
       camera_auto_whitebalance: 0 #是否使用自动白平衡 0:关闭 1:单次 2:连续
-      
 camera2: #与命名空间对应，使用的命名空间决定了读入的参数
   camera_driver_node:
     ros__parameters:
-      camera_name: camera1
-      camera_height: 540 #使用裁剪实现的，数值大小会影响相机视野
-      camera_width: 720 #使用裁剪实现的，数值大小会影响相机视野
+      camera_name: camera2 #相机名称，用于区分不同相机，从相机客户端中修改
+      camera_height: 1080 #使用裁剪实现的，数值大小会影响相机视野
+      camera_width: 1440 #使用裁剪实现的，数值大小会影响相机视野
       camera_exp: 4500.0 #曝光时间，曝光时间与帧率尽量匹配
       camera_gain: 15.0 #增益，增益越大，图像越亮，但噪点越明显、动态范围越小，应该在亮度允许的条件下尽量小
       camera_framerate: 200 #帧率，帧率与曝光时间尽量匹配
+      camera_roi_offset_x: 0 #裁剪图像的偏移量
+      camera_roi_offset_y: 0 #裁剪图像的偏移量
+      camera_auto_exp: 0 #是否使用自动曝光 0:关闭 1:单次 2:连续
+      camera_auto_maxexp: 4500 #自动曝光的最大值
+      camera_auto_minexp: 100 #自动曝光的最小值
+      camera_auto_gain: 0 #是否使用自动增益 0:关闭 1:单次 2:连续
+      camera_auto_maxgain: 17.0 #自动增益的最大值
+      camera_auto_mingain: 0.0 #自动增益的最小值
+      camera_auto_whitebalance: 0 #是否使用自动白平衡 0:关闭 1:单次 2:连续
