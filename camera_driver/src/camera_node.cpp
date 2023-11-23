@@ -67,11 +67,6 @@ int main(int argc, char **argv)
             nRet = node->get_image();
             if (nRet == MV_OK)
             {
-                nRet = node->convert_pixel_format();
-                if (MV_OK != nRet)
-                {
-                    printf("MV_CC_ConvertPixelType fail! nRet [%x]\n", nRet);
-                }
                 nRet = node->publish_message();
                 if (MV_OK != nRet)
                 {
@@ -97,7 +92,7 @@ int main(int argc, char **argv)
             if(node->param_change)
             {
                 break;
-            }
+            }  
             loop_rate.sleep();
         }
         // ch:停止取流 | en:Stop grab image

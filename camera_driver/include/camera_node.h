@@ -323,6 +323,32 @@ public:
                 state = -1;
             }
         }
+        // 获取图像格式信息
+        MVCC_ENUMVALUE stPixelFormat = {0};
+        nRet = MV_CC_GetEnumValue(handle, "PixelFormat", &stPixelFormat);
+        if (MV_OK == nRet)
+        {
+            printf("PixelFormat current value:%x\n", stPixelFormat.nCurValue);
+        }
+        else
+        {
+            printf("get PixelFormat failed! nRet [%x]\n", nRet);
+            state = -1;
+        }
+        // 设置图像格式
+        if(pixel_format != stPixelFormat.nCurValue)
+        {
+            nRet = MV_CC_SetEnumValue(handle, "PixelFormat", pixel_format);
+            if (MV_OK == nRet)
+            {
+                printf("set PixelFormat %x\n", pixel_format);
+            }
+            else
+            {
+                printf("set PixelFormat failed! nRet [%x]\n", nRet);
+                state = -1;
+            }
+        }
         // 获取曝光信息
         // get IFloat variable
         MVCC_FLOATVALUE stExposureTime = {0};
@@ -492,7 +518,7 @@ public:
         // set IFloat variable
         if(abs(camera_auto_maxgain - stAutoGainUpperLimit.fCurValue) > 0.01)
         {
-            nRet = MV_CC_SetFloatValue(handle, "AutoGainupperLimit", camera_auto_maxgain);
+            nRet = MV_CC_SetFloatValue(handle, "AutoGainUpperLimit", camera_auto_maxgain);
             if (MV_OK == nRet)
             {
                 printf("set camera_auto_maxgain %f\n", camera_auto_maxgain);
@@ -752,28 +778,34 @@ public:
         image_header.stamp = camera_time_ros; //时间戳的零点为相机上电时间
         image_header.stamp = camera_time_ros;
         image_header.frame_id = "hik_camera";
-        cv::Mat image(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, CV_8UC3);
-        //将char*数组转换为Mat
-        for(int j = 0; j < stOutFrame.stFrameInfo.nHeight; j++)
-        {
-            unsigned char* data = image.ptr<unsigned char>(j);
-            unsigned char* pSubDataForRGB = pDataForBGR + (j + 1) * stOutFrame.stFrameInfo.nWidth * 3;
-            memcpy(data, pSubDataForRGB, stOutFrame.stFrameInfo.nWidth * 3);
-        }
+        // cv::Mat image(stOutFrame.stFrameInfo.nHeight, stOutFrame.stFrameInfo.nWidth, CV_8UC3);
+        // //将char*数组转换为Mat
+        // for(int j = 0; j < stOutFrame.stFrameInfo.nHeight; j++)
+        // {
+        //     unsigned char* data = image.ptr<unsigned char>(j);
+        //     unsigned char* pSubDataForRGB = stOutFrame.pBufAddr + (j + 1) * stOutFrame.stFrameInfo.nWidth * 3;
+        //     memcpy(data, pSubDataForRGB, stOutFrame.stFrameInfo.nWidth * 3);
+        // }
         //使用cv_bridge将Mat转为sensor_msgs::msg::Image类型
-        cv_bridge::CvImage cv_image;
-        cv_image.encoding = "bgr8";
-        cv_image.header = image_header;
-        cv_image.image = image;
-        cv_image.toImageMsg(image_msg);
+        // cv_bridge::CvImage cv_image;
+        // cv_image.encoding = "bgr8";
+        // cv_image.header = image_header;
+        // cv_image.image = image;
+        image_msg.height = stOutFrame.stFrameInfo.nHeight;
+        image_msg.width = stOutFrame.stFrameInfo.nWidth;
+        image_msg.encoding = "bgr8";
+        image_msg.header = image_header;
+        image_msg.step = stOutFrame.stFrameInfo.nWidth * 3;
+        image_msg.data = std::vector<unsigned char>(stOutFrame.pBufAddr, stOutFrame.pBufAddr + stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3);
+        //cv_image.toImageMsg(image_msg);
         image_pub->publish(image_msg);
         //cv::imshow("rgb", image);
         //cv::waitKey(1);
-        if (pDataForBGR)
-        {
-            free(pDataForBGR);
-            pDataForBGR = NULL;
-        }
+        // if (pDataForBGR)
+        // {
+        //     free(pDataForBGR);
+        //     pDataForBGR = NULL;
+        // }
         return nRet;
     }
     //释放图像缓存
@@ -793,7 +825,7 @@ public:
     {
         // 打印一句
         RCLCPP_INFO(this->get_logger(), "%s节点已经启动.",name.c_str());
-        image_pub = this->create_publisher<sensor_msgs::msg::Image>("hik_camera/rgb", 1);
+        image_pub = this->create_publisher<sensor_msgs::msg::Image>("hik_camera/rgb", 10);
         memset(&stOutFrame, 0, sizeof(MV_FRAME_OUT));
         height_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
         width_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
@@ -1092,6 +1124,7 @@ private:
     int camera_auto_gain = 0;
     int camera_auto_whitebalance = 0;
     int camera_auto_maxexp = 4500;
+    int pixel_format = 0x02180014;
     int camera_auto_minexp = 100;
     float camera_auto_maxgain = 17;
     float camera_auto_mingain = 0;
