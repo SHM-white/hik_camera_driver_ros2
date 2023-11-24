@@ -89,5 +89,13 @@ ROS2下的海康相机驱动
 
 修改yaml文件和launch文件，两套参数按照命名空间区分。
 
+### 常见问题
+
+运行某些软件时报错： "undefined symbol: libusb_set_option"
+
+问题原因：MVS在安装时，会安装一个libusb库，他的版本和系统自带的不同，导致报错。
+
+解决方案：目前我就直接删除了/opt/MVS/lib/64/libusb-1.0.so，目前还没发现问题。
+
 #### by:[@DoveJH](https://github.com/DoveJH) 1358446393@qq.com
 
