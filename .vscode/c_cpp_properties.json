@@ -9,7 +9,7 @@
                 "/usr/local/include/**",
                 "/opt/MVS/include/**"
             ],
-            "defines": [],
+            "defines": ["ROOT_DIR=\"${workspaceFolder}\""],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++17",

@@ -61,6 +61,29 @@ int CameraNode::getParam()
     this->get_parameter("camera_auto_maxgain", camera_auto_maxgain);           /*获取参数*/
     this->declare_parameter("camera_auto_mingain", 0.0);                       /*声明参数*/
     this->get_parameter("camera_auto_mingain", camera_auto_mingain);           /*获取参数*/
+    std::vector<double> camera_matrix_vector;
+    this->declare_parameter("camera_matrix", std::vector<double>(9, 0.0));     /*声明参数*/
+    this->get_parameter("camera_matrix", camera_matrix_vector);                /*获取参数*/
+    for (int i = 0; i < 9; i++)
+    {
+        camera_matrix[i] = camera_matrix_vector[i];
+    }
+    std::vector<double> camera_projection_vector;
+    this->declare_parameter("camera_projection", std::vector<double>(12, 0.0));/*声明参数*/
+    this->get_parameter("camera_projection", camera_projection_vector);        /*获取参数*/
+    for (int i = 0; i < 12; i++)
+    {
+        camera_projection[i] = camera_projection_vector[i];
+    }
+    this->declare_parameter("camera_distortion", std::vector<double>(5, 0.0)); /*声明参数*/
+    this->get_parameter("camera_distortion", camera_distortion);               /*获取参数*/
+    std::vector<double> camera_rectification_vector;
+    this->declare_parameter("camera_rectification", std::vector<double>(9, 0.0));/*声明参数*/
+    this->get_parameter("camera_rectification", camera_rectification_vector);  /*获取参数*/
+    for (int i = 0; i < 9; i++)
+    {
+        camera_rectification[i] = camera_rectification_vector[i];
+    }
 }
 // 从相机内部获取参数，如果与要求不一致，则进行修改
 int CameraNode::getAndSetCameraParam()
@@ -738,6 +761,15 @@ int CameraNode::publish_message()
     image_msg.step = stOutFrame.stFrameInfo.nWidth * 3;
     image_msg.data = std::vector<unsigned char>(stOutFrame.pBufAddr, stOutFrame.pBufAddr + stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3);
     image_pub->publish(image_msg);
+    camera_info_msg.header = image_header;
+    camera_info_msg.height = stOutFrame.stFrameInfo.nHeight;
+    camera_info_msg.width = stOutFrame.stFrameInfo.nWidth;
+    camera_info_msg.distortion_model = "plumb_bob";
+    camera_info_msg.d = camera_distortion;
+    camera_info_msg.k = camera_matrix;
+    camera_info_msg.r = camera_rectification;
+    camera_info_msg.p = camera_projection;
+    camera_info_pub->publish(camera_info_msg);
     return nRet;
 }
 // 释放图像缓存
@@ -755,7 +787,9 @@ CameraNode::CameraNode(std::string name) : Node(name)
 {
     // 打印一句
     RCLCPP_INFO(this->get_logger(), "%s节点已经启动.", name.c_str());
+    // yaml_config = YAML::LoadFile(std::string(ROOT_DIR)+std::string("yaml/camera.yaml"));
     image_pub = this->create_publisher<sensor_msgs::msg::Image>("image_raw", 10);
+    camera_info_pub = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);
     memset(&stOutFrame, 0, sizeof(MV_FRAME_OUT));
     height_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
     width_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);

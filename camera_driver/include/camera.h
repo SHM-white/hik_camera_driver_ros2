@@ -9,9 +9,9 @@
 #include "opencv2/opencv.hpp"
 #include "MvCameraControl.h"
 #include "sensor_msgs/msg/image.hpp"
-#include "cv_bridge/cv_bridge.h"
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/srv/set_camera_info.hpp>
+// #include <yaml-cpp/yaml.h>
 // Define the CameraNode class
 /*
     创建一个类节点，名字叫做CameraNode,继承自Node.
@@ -62,8 +62,11 @@ public:
     bool param_change = false;
 private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub;
+    rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub;
     std_msgs::msg::Header image_header;
     sensor_msgs::msg::Image image_msg;
+    sensor_msgs::msg::CameraInfo camera_info_msg;
+    // YAML::Node yaml_config;
     int camera_height = 1080;
     int camera_width = 1440;
     int camera_framerate = 200;
@@ -80,6 +83,10 @@ private:
     float camera_exp = 4000;
     float camera_gain = 5;
     std::string camera_name="camera";
+    std::array<double, 9> camera_matrix;
+    std::vector<double> camera_distortion;
+    std::array<double, 9> camera_rectification;
+    std::array<double, 12> camera_projection;
     unsigned int nIndex = 0;
     void* handle = NULL;
     MV_CC_DEVICE_INFO_LIST stDeviceList;

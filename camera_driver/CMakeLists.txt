@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(camera_driver)
-
+add_definitions(-DROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/\")
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -20,7 +20,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(cv_bridge REQUIRED)
 include_directories(
         /opt/MVS/include/
         include
@@ -42,12 +41,11 @@ LINK_DIRECTORIES(
 )
 ament_package()
 add_executable(camera_driver_node src/camera_node.cpp src/camera.cpp)
-ament_target_dependencies(camera_driver_node rclcpp sensor_msgs OpenCV cv_bridge)
+ament_target_dependencies(camera_driver_node rclcpp sensor_msgs OpenCV)
 
 
 target_link_libraries(camera_driver_node
         MvCameraControl
-        ${OpenCV_LIBRARIES}
 )
 
 install(TARGETS
