@@ -38,6 +38,8 @@ endif()
 
 LINK_DIRECTORIES(
         /opt/MVS/lib/64/
+        /usr/lib/x86_64-linux-gnu/
+
 )
 ament_package()
 add_executable(camera_driver_node src/camera_node.cpp src/camera.cpp)
@@ -46,6 +48,7 @@ ament_target_dependencies(camera_driver_node rclcpp sensor_msgs OpenCV)
 
 target_link_libraries(camera_driver_node
         MvCameraControl
+        yaml-cpp
 )
 
 install(TARGETS

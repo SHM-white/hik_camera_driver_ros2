@@ -787,7 +787,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
 {
     // 打印一句
     RCLCPP_INFO(this->get_logger(), "%s节点已经启动.", name.c_str());
-    // yaml_config = YAML::LoadFile(std::string(ROOT_DIR)+std::string("yaml/camera.yaml"));
+    yaml_config = YAML::LoadFile(std::string(ROOT_DIR)+std::string("yaml/camera.yaml"));
     image_pub = this->create_publisher<sensor_msgs::msg::Image>("image_raw", 10);
     camera_info_pub = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);
     memset(&stOutFrame, 0, sizeof(MV_FRAME_OUT));

@@ -12,21 +12,21 @@ int main(int argc, char **argv)
         if (MV_OK != nRet)
         {
             printf("Enum Devices fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         // ch:选择设备并创建句柄 | en:Select device and create handle
         nRet = node->select_device();
         if (MV_OK != nRet)
         {
             printf("Create Handle fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         // ch:打开设备 | en:Open device
         nRet = node->open_device();
         if (MV_OK != nRet)
         {
             printf("Open Device fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         //修改相机参数
         node->getAndSetCameraParam();
@@ -37,28 +37,28 @@ int main(int argc, char **argv)
         if (MV_OK != nRet)
         {
             printf("Set Trigger Mode fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         // ch:设置触发源 | en:Set trigger source
         //nRet = node->set_trigger_source();
         if (MV_OK != nRet)
         {
             printf("Set Trigger Source fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         // ch:获取数据包大小 | en:Get payload size
         nRet = node->get_package_size();
         if (MV_OK != nRet)
         {
             printf("Get Payload Size fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         // ch:开始取流 | en:Start grab image
         nRet = node->start_grabbing();
         if (MV_OK != nRet)
         {
             printf("Start Grabbing fail! nRet [0x%x]\n", nRet);
-            goto RESTART;
+            break;
         }
         rclcpp::WallRate loop_rate(node->get_framerate());
         while (rclcpp::ok())
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
                 node->restart_flag--;
                 if(node->restart_flag <= 0)
                 {
-                    goto RESTART;
+                    break;
                 }
             }
             nRet = node->free_image_buffer();
@@ -90,7 +90,10 @@ int main(int argc, char **argv)
             rclcpp::spin_some(node);
             if(node->param_change)
             {
-                break;
+                node->param_change = false;
+                node->stop_grabbing();
+                node->getAndSetCameraParam();
+                node->start_grabbing();
             }  
             loop_rate.sleep();
         }
@@ -114,11 +117,6 @@ int main(int argc, char **argv)
         {
             printf("Destroy Handle fail! nRet [0x%x]\n", nRet);
             break;
-        }
-        if(node->param_change)
-        {
-            node->param_change = false;
-            goto RESTART;
         }
     }while (0);
     printf("相机驱动节点安全退出\n");

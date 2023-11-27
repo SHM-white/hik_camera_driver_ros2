@@ -11,7 +11,7 @@
 #include "sensor_msgs/msg/image.hpp"
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/srv/set_camera_info.hpp>
-// #include <yaml-cpp/yaml.h>
+#include <yaml-cpp/yaml.h>
 // Define the CameraNode class
 /*
     创建一个类节点，名字叫做CameraNode,继承自Node.
@@ -66,7 +66,7 @@ private:
     std_msgs::msg::Header image_header;
     sensor_msgs::msg::Image image_msg;
     sensor_msgs::msg::CameraInfo camera_info_msg;
-    // YAML::Node yaml_config;
+    YAML::Node yaml_config;
     int camera_height = 1080;
     int camera_width = 1440;
     int camera_framerate = 200;
