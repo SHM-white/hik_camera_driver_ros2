@@ -1,5 +1,4 @@
-#include"camera_node.h"
-
+#include"camera.h"
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);

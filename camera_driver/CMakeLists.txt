@@ -41,7 +41,7 @@ LINK_DIRECTORIES(
         /opt/MVS/lib/64/
 )
 ament_package()
-add_executable(camera_driver_node src/camera_node.cpp)
+add_executable(camera_driver_node src/camera_node.cpp src/camera.cpp)
 ament_target_dependencies(camera_driver_node rclcpp sensor_msgs OpenCV cv_bridge)
 
 
