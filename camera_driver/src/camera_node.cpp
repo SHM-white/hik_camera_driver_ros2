@@ -29,7 +29,7 @@ int main(int argc, char **argv)
             break;
         }
         //修改相机参数
-        node->getAndSetCameraParam();
+        node->getAndSetCameraParam(CameraParams::ALL_PARAMS);
         // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
         nRet = node->detection_network_optimal_package_size();
         // ch:设置触发模式为on | en:Set trigger mode as on
@@ -88,12 +88,12 @@ int main(int argc, char **argv)
                 printf("Free Image Buffer fail! nRet [0x%x]\n", nRet);
             }
             rclcpp::spin_some(node);
-            if(node->param_change)
+            if(node->param_change != NONE)
             {
-                node->param_change = false;
                 node->stop_grabbing();
-                node->getAndSetCameraParam();
+                node->getAndSetCameraParam(node->param_change);
                 node->start_grabbing();
+                node->param_change = NONE;
             }  
             loop_rate.sleep();
         }

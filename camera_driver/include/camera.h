@@ -16,6 +16,25 @@
 /*
     创建一个类节点，名字叫做CameraNode,继承自Node.
 */
+enum CameraParams
+{
+    ALL_PARAMS,
+    CAMERA_HEIGHT,
+    CAMERA_WIDTH,
+    CAMERA_FRAMERATE,
+    CAMERA_ROI_OFFSET_X,
+    CAMERA_ROI_OFFSET_Y,
+    CAMERA_AUTO_EXP,
+    CAMERA_AUTO_GAIN,
+    CAMERA_AUTO_WHITEBALANCE,
+    CAMERA_AUTO_MAXEXP,
+    CAMERA_AUTO_MINEXP,
+    CAMERA_AUTO_MAXGAIN,
+    CAMERA_AUTO_MINGAIN,
+    CAMERA_EXP,
+    CAMERA_GAIN,
+    NONE
+};
 class CameraNode : public rclcpp::Node
 {
 
@@ -25,7 +44,22 @@ public:
     //读取rosparam
     int getParam();
     //从相机内部获取参数，如果与要求不一致，则进行修改
-    int getAndSetCameraParam();
+    int getAndSetCameraParam(CameraParams which_param = CameraParams::ALL_PARAMS);
+    int getAndSetCameraHeight();
+    int getAndSetCameraWidth();
+    int getAndSetCameraFramerate();
+    int getAndSetCameraRoiOffsetX();
+    int getAndSetCameraRoiOffsetY();
+    int getAndSetCameraAutoExp();
+    int getAndSetCameraAutoGain();
+    int getAndSetCameraAutoWhitebalance();
+    int getAndSetCameraAutoMaxexp();
+    int getAndSetCameraAutoMinexp();
+    int getAndSetCameraAutoMaxgain();
+    int getAndSetCameraAutoMingain();
+    int getAndSetCameraExp();
+    int getAndSetCameraGain();
+    int getAndSetCameraPixelFormat();
     //枚举相机
     int enum_devices();
     //选择相机，创建句柄
@@ -59,7 +93,7 @@ public:
     // 构造函数,有一个参数为节点名称
     CameraNode(std::string name);
     int restart_flag = 10;
-    bool param_change = false;
+    CameraParams param_change = NONE;
 private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub;
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub;

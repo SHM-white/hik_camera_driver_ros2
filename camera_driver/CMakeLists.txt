@@ -42,7 +42,7 @@ LINK_DIRECTORIES(
 
 )
 ament_package()
-add_executable(camera_driver_node src/camera_node.cpp src/camera.cpp)
+add_executable(camera_driver_node src/camera_node.cpp src/camera.cpp src/camera_param.cpp)
 ament_target_dependencies(camera_driver_node rclcpp sensor_msgs OpenCV)
 
 

@@ -62,15 +62,15 @@ int CameraNode::getParam()
     this->declare_parameter("camera_auto_mingain", 0.0);                       /*声明参数*/
     this->get_parameter("camera_auto_mingain", camera_auto_mingain);           /*获取参数*/
     std::vector<double> camera_matrix_vector;
-    this->declare_parameter("camera_matrix", std::vector<double>(9, 0.0));     /*声明参数*/
-    this->get_parameter("camera_matrix", camera_matrix_vector);                /*获取参数*/
+    this->declare_parameter("camera_matrix", std::vector<double>(9, 0.0)); /*声明参数*/
+    this->get_parameter("camera_matrix", camera_matrix_vector);            /*获取参数*/
     for (int i = 0; i < 9; i++)
     {
         camera_matrix[i] = camera_matrix_vector[i];
     }
     std::vector<double> camera_projection_vector;
-    this->declare_parameter("camera_projection", std::vector<double>(12, 0.0));/*声明参数*/
-    this->get_parameter("camera_projection", camera_projection_vector);        /*获取参数*/
+    this->declare_parameter("camera_projection", std::vector<double>(12, 0.0)); /*声明参数*/
+    this->get_parameter("camera_projection", camera_projection_vector);         /*获取参数*/
     for (int i = 0; i < 12; i++)
     {
         camera_projection[i] = camera_projection_vector[i];
@@ -78,496 +78,12 @@ int CameraNode::getParam()
     this->declare_parameter("camera_distortion", std::vector<double>(5, 0.0)); /*声明参数*/
     this->get_parameter("camera_distortion", camera_distortion);               /*获取参数*/
     std::vector<double> camera_rectification_vector;
-    this->declare_parameter("camera_rectification", std::vector<double>(9, 0.0));/*声明参数*/
-    this->get_parameter("camera_rectification", camera_rectification_vector);  /*获取参数*/
+    this->declare_parameter("camera_rectification", std::vector<double>(9, 0.0)); /*声明参数*/
+    this->get_parameter("camera_rectification", camera_rectification_vector);     /*获取参数*/
     for (int i = 0; i < 9; i++)
     {
         camera_rectification[i] = camera_rectification_vector[i];
     }
-}
-// 从相机内部获取参数，如果与要求不一致，则进行修改
-int CameraNode::getAndSetCameraParam()
-{
-    int nRet = MV_OK;
-    int state = MV_OK;
-    // 获取高度信息
-    // get IInteger variable
-    MVCC_INTVALUE stHeight = {0};
-    nRet = MV_CC_GetIntValue(handle, "Height", &stHeight);
-    if (MV_OK == nRet)
-    {
-        if (camera_height > stHeight.nMax)
-        {
-            camera_height = stHeight.nMax;
-        }
-        else if (camera_height < stHeight.nMin)
-        {
-            camera_height = stHeight.nMin;
-        }
-        printf("camera_height current value:%d, max value:%d, min value:%d, increment value:%d\n", stHeight.nCurValue, stHeight.nMax, stHeight.nMin, stHeight.nInc);
-    }
-    else
-    {
-        printf("get height failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置高度
-    // set IInteger variable
-    if (camera_height != stHeight.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "Height", camera_height);
-        if (MV_OK == nRet)
-        {
-            printf("set height %d\n", camera_height);
-        }
-        else
-        {
-            printf("set height failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取宽度信息
-    // get IInteger variable
-    MVCC_INTVALUE stWidth = {0};
-    nRet = MV_CC_GetIntValue(handle, "Width", &stWidth);
-    if (MV_OK == nRet)
-    {
-        if (camera_width > stWidth.nMax)
-        {
-            camera_width = stWidth.nMax;
-        }
-        else if (camera_width < stWidth.nMin)
-        {
-            camera_width = stWidth.nMin;
-        }
-        printf("camera_width current value:%d, max value:%d, min value:%d, increment value:%d\n", stWidth.nCurValue, stWidth.nMax, stWidth.nMin, stWidth.nInc);
-    }
-    else
-    {
-        printf("get camera_width failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置宽度
-    // set IInteger variable
-    if (camera_width != stWidth.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "Width", camera_width);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_width %d\n", camera_width);
-        }
-        else
-        {
-            printf("set camera_width failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-
-    // 获取X偏移信息
-    // get IInteger variable
-    MVCC_INTVALUE stOffsetX = {0};
-    nRet = MV_CC_GetIntValue(handle, "OffsetX", &stOffsetX);
-    if (MV_OK == nRet)
-    {
-        if (camera_roi_offset_x > stOffsetX.nMax)
-        {
-            camera_roi_offset_x = stOffsetX.nMax;
-        }
-        else if (camera_roi_offset_x < stOffsetX.nMin)
-        {
-            camera_roi_offset_x = stOffsetX.nMin;
-        }
-        printf("camera_OffsetX current value:%d, max value:%d, min value:%d, increment value:%d\n", stOffsetX.nCurValue, stOffsetX.nMax, stOffsetX.nMin, stOffsetX.nInc);
-    }
-    else
-    {
-        printf("get camera_OffsetX failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置X偏移
-    // set IInteger variable
-    if (camera_roi_offset_x != stOffsetX.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "OffsetX", camera_roi_offset_x);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_OffsetX %d\n", camera_roi_offset_x);
-        }
-        else
-        {
-            printf("set camera_OffsetX failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取Y偏移信息
-    // get IInteger variable
-    MVCC_INTVALUE stOffsetY = {0};
-    nRet = MV_CC_GetIntValue(handle, "OffsetY", &stOffsetY);
-    if (MV_OK == nRet)
-    {
-        if (camera_roi_offset_y > stOffsetY.nMax)
-        {
-            camera_roi_offset_y = stOffsetY.nMax;
-        }
-        else if (camera_roi_offset_y < stOffsetY.nMin)
-        {
-            camera_roi_offset_y = stOffsetY.nMin;
-        }
-        printf("camera_OffsetY current value:%d, max value:%d, min value:%d, increment value:%d\n", stOffsetY.nCurValue, stOffsetY.nMax, stOffsetY.nMin, stOffsetY.nInc);
-    }
-    else
-    {
-        printf("get camera_OffsetY failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置Y偏移
-    // set IInteger variable
-    if (camera_roi_offset_y != stOffsetY.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "OffsetY", camera_roi_offset_y);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_OffsetY %d\n", camera_roi_offset_y);
-        }
-        else
-        {
-            printf("set camera_OffsetY failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动曝光信息
-    MVCC_ENUMVALUE stExposureAuto = {0};
-    nRet = MV_CC_GetEnumValue(handle, "ExposureAuto", &stExposureAuto);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_exp != 0 && camera_auto_exp != 1 && camera_auto_exp != 2)
-        {
-            camera_auto_exp = stExposureAuto.nCurValue;
-        }
-        printf("auto exposure current value:%d\n", stExposureAuto.nCurValue);
-    }
-    else
-    {
-        printf("get auto exposure failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动曝光
-    if (camera_auto_exp != stExposureAuto.nCurValue)
-    {
-        nRet = MV_CC_SetEnumValue(handle, "ExposureAuto", camera_auto_exp);
-        if (MV_OK == nRet)
-        {
-            printf("set auto exposure %d\n", camera_auto_exp);
-        }
-        else
-        {
-            printf("set auto exposure failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动增益信息
-    MVCC_ENUMVALUE stGainAuto = {0};
-    nRet = MV_CC_GetEnumValue(handle, "GainAuto", &stGainAuto);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_gain != 0 && camera_auto_gain != 1 && camera_auto_gain != 2)
-        {
-            camera_auto_gain = stGainAuto.nCurValue;
-        }
-        printf("auto gain current value:%d\n", stGainAuto.nCurValue);
-    }
-    else
-    {
-        printf("get auto gain failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动增益
-    if (camera_auto_gain != stGainAuto.nCurValue)
-    {
-        nRet = MV_CC_SetEnumValue(handle, "GainAuto", camera_auto_gain);
-        if (MV_OK == nRet)
-        {
-            printf("set auto gain %d\n", camera_auto_gain);
-        }
-        else
-        {
-            printf("set auto gain failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动白平衡信息
-    MVCC_ENUMVALUE stBalanceWhiteAuto = {0};
-    nRet = MV_CC_GetEnumValue(handle, "BalanceWhiteAuto", &stBalanceWhiteAuto);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_whitebalance != 0 && camera_auto_whitebalance != 1 && camera_auto_whitebalance != 2)
-        {
-            camera_auto_whitebalance = stBalanceWhiteAuto.nCurValue;
-        }
-        printf("auto whitebalance current value:%d\n", stBalanceWhiteAuto.nCurValue);
-    }
-    else
-    {
-        printf("get auto whitebalance failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动白平衡
-    if (camera_auto_whitebalance != stBalanceWhiteAuto.nCurValue)
-    {
-        nRet = MV_CC_SetEnumValue(handle, "BalanceWhiteAuto", camera_auto_whitebalance);
-        if (MV_OK == nRet)
-        {
-            printf("set auto whitebalance %d\n", camera_auto_whitebalance);
-        }
-        else
-        {
-            printf("set auto whitebalance failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取图像格式信息
-    MVCC_ENUMVALUE stPixelFormat = {0};
-    nRet = MV_CC_GetEnumValue(handle, "PixelFormat", &stPixelFormat);
-    if (MV_OK == nRet)
-    {
-        printf("PixelFormat current value:%x\n", stPixelFormat.nCurValue);
-    }
-    else
-    {
-        printf("get PixelFormat failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置图像格式
-    if (pixel_format != stPixelFormat.nCurValue)
-    {
-        nRet = MV_CC_SetEnumValue(handle, "PixelFormat", pixel_format);
-        if (MV_OK == nRet)
-        {
-            printf("set PixelFormat %x\n", pixel_format);
-        }
-        else
-        {
-            printf("set PixelFormat failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取曝光信息
-    // get IFloat variable
-    MVCC_FLOATVALUE stExposureTime = {0};
-    nRet = MV_CC_GetFloatValue(handle, "ExposureTime", &stExposureTime);
-    if (MV_OK == nRet)
-    {
-        if (camera_exp > stExposureTime.fMax)
-        {
-            camera_exp = stExposureTime.fMax;
-        }
-        else if (camera_exp < stExposureTime.fMin)
-        {
-            camera_exp = stExposureTime.fMin;
-        }
-        printf("exposure time current value:%f, max value:%f, min value:%f\n", stExposureTime.fCurValue, stExposureTime.fMax, stExposureTime.fMin);
-    }
-    else
-    {
-        printf("get exposure time failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置曝光
-    // set IFloat variable
-    if (abs(camera_exp - stExposureTime.fCurValue) > 0.00001)
-    {
-        nRet = MV_CC_SetFloatValue(handle, "ExposureTime", camera_exp);
-        if (MV_OK == nRet)
-        {
-            printf("set exposure time %f\n", camera_exp);
-        }
-        else
-        {
-            printf("set exposure time failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动最小曝光信息
-    // get IFloat variable
-    MVCC_INTVALUE stAutoExposureTimeLowerLimit = {0};
-    nRet = MV_CC_GetIntValue(handle, "AutoExposureTimeLowerLimit", &stAutoExposureTimeLowerLimit);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_minexp > stAutoExposureTimeLowerLimit.nMax)
-        {
-            camera_auto_minexp = stAutoExposureTimeLowerLimit.nMax;
-        }
-        else if (camera_auto_minexp < stAutoExposureTimeLowerLimit.nMin)
-        {
-            camera_auto_minexp = stAutoExposureTimeLowerLimit.nMin;
-        }
-        printf("camera_auto_minexp current value:%d, max value:%d, min value:%d\n", stAutoExposureTimeLowerLimit.nCurValue, stAutoExposureTimeLowerLimit.nMax, stAutoExposureTimeLowerLimit.nMin);
-    }
-    else
-    {
-        printf("get camera_auto_minexp failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动最小曝光
-    // set IFloat variable
-    if (camera_auto_minexp != stAutoExposureTimeLowerLimit.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "AutoExposureTimeLowerLimit", camera_auto_minexp);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_auto_minexp %d\n", camera_auto_minexp);
-        }
-        else
-        {
-            printf("set camera_auto_minexp failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动最大曝光信息
-    // get IFloat variable
-    MVCC_INTVALUE stAutoExposureTimeUpperLimit = {0};
-    nRet = MV_CC_GetIntValue(handle, "AutoExposureTimeUpperLimit", &stAutoExposureTimeUpperLimit);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_maxexp > stAutoExposureTimeUpperLimit.nMax)
-        {
-            camera_auto_maxexp = stAutoExposureTimeUpperLimit.nMax;
-        }
-        else if (camera_auto_maxexp < stAutoExposureTimeUpperLimit.nMin)
-        {
-            camera_auto_maxexp = stAutoExposureTimeUpperLimit.nMin;
-        }
-        printf("camera_auto_maxexp current value:%d, max value:%d, min value:%d\n", stAutoExposureTimeUpperLimit.nCurValue, stAutoExposureTimeUpperLimit.nMax, stAutoExposureTimeUpperLimit.nMin);
-    }
-    else
-    {
-        printf("get camera_auto_maxexp failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动最大曝光
-    // set IFloat variable
-    if (camera_auto_maxexp != stAutoExposureTimeUpperLimit.nCurValue)
-    {
-        nRet = MV_CC_SetIntValue(handle, "AutoExposureTimeUpperLimit", camera_auto_maxexp);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_auto_maxexp %d\n", camera_auto_maxexp);
-        }
-        else
-        {
-            printf("set camera_auto_maxexp failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取增益信息
-    // get IFloat variable
-    MVCC_FLOATVALUE stGain = {0};
-    nRet = MV_CC_GetFloatValue(handle, "Gain", &stGain);
-    if (MV_OK == nRet)
-    {
-        if (camera_gain > stGain.fMax)
-        {
-            camera_gain = stGain.fMax;
-        }
-        else if (camera_gain < stGain.fMin)
-        {
-            camera_gain = stGain.fMin;
-        }
-        printf("camera_gain current value:%f, max value:%f, min value:%f\n", stGain.fCurValue, stGain.fMax, stGain.fMin);
-    }
-    else
-    {
-        printf("get camera_gain failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置增益
-    // set IFloat variable
-    if (abs(camera_gain - stGain.fCurValue) > 0.01)
-    {
-        nRet = MV_CC_SetFloatValue(handle, "Gain", camera_gain);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_gain %f\n", camera_gain);
-        }
-        else
-        {
-            printf("set camera_gain failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动最大增益信息
-    // get IFloat variable
-    MVCC_FLOATVALUE stAutoGainUpperLimit = {0};
-    nRet = MV_CC_GetFloatValue(handle, "AutoGainUpperLimit", &stAutoGainUpperLimit);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_maxgain > stAutoGainUpperLimit.fMax)
-        {
-            camera_auto_maxgain = stAutoGainUpperLimit.fMax;
-        }
-        else if (camera_auto_maxgain < stAutoGainUpperLimit.fMin)
-        {
-            camera_auto_maxgain = stAutoGainUpperLimit.fMin;
-        }
-        printf("camera_auto_maxgain current value:%f, max value:%f, min value:%f\n", stAutoGainUpperLimit.fCurValue, stAutoGainUpperLimit.fMax, stAutoGainUpperLimit.fMin);
-    }
-    else
-    {
-        printf("get camera_auto_maxgain failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动最大增益
-    // set IFloat variable
-    if (abs(camera_auto_maxgain - stAutoGainUpperLimit.fCurValue) > 0.01)
-    {
-        nRet = MV_CC_SetFloatValue(handle, "AutoGainUpperLimit", camera_auto_maxgain);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_auto_maxgain %f\n", camera_auto_maxgain);
-        }
-        else
-        {
-            printf("set camera_auto_maxgain failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    // 获取自动最小增益信息
-    // get IFloat variable
-    MVCC_FLOATVALUE stAutoGainLowerLimit = {0};
-    nRet = MV_CC_GetFloatValue(handle, "AutoGainLowerLimit", &stAutoGainLowerLimit);
-    if (MV_OK == nRet)
-    {
-        if (camera_auto_mingain > stAutoGainLowerLimit.fMax)
-        {
-            camera_auto_mingain = stAutoGainLowerLimit.fMax;
-        }
-        else if (camera_auto_mingain < stAutoGainLowerLimit.fMin)
-        {
-            camera_auto_mingain = stAutoGainLowerLimit.fMin;
-        }
-        printf("camera_auto_mingain current value:%f, max value:%f, min value:%f\n", stAutoGainLowerLimit.fCurValue, stAutoGainLowerLimit.fMax, stAutoGainLowerLimit.fMin);
-    }
-    else
-    {
-        printf("get camera_auto_mingain failed! nRet [%x]\n", nRet);
-        state = -1;
-    }
-    // 设置自动最小增益
-    // set IFloat variable
-    if (abs(camera_auto_mingain - stAutoGainLowerLimit.fCurValue) > 0.01)
-    {
-        nRet = MV_CC_SetFloatValue(handle, "AutoGainLowerLimit", camera_auto_mingain);
-        if (MV_OK == nRet)
-        {
-            printf("set camera_auto_mingain %f\n", camera_auto_mingain);
-        }
-        else
-        {
-            printf("set camera_auto_mingain failed! nRet [%x]\n", nRet);
-            state = -1;
-        }
-    }
-    return state;
 }
 // 枚举相机
 int CameraNode::enum_devices()
@@ -787,7 +303,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
 {
     // 打印一句
     RCLCPP_INFO(this->get_logger(), "%s节点已经启动.", name.c_str());
-    yaml_config = YAML::LoadFile(std::string(ROOT_DIR)+std::string("yaml/camera.yaml"));
+    yaml_config = YAML::LoadFile(std::string(ROOT_DIR) + std::string("yaml/camera.yaml"));
     image_pub = this->create_publisher<sensor_msgs::msg::Image>("image_raw", 10);
     camera_info_pub = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);
     memset(&stOutFrame, 0, sizeof(MV_FRAME_OUT));
@@ -820,7 +336,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_height = p.as_int();
-            param_change = true;
+            param_change = CAMERA_HEIGHT;
         }
     };
     auto width_callback = [this](const rclcpp::Parameter &p)
@@ -838,7 +354,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_width = p.as_int();
-            param_change = true;
+            param_change = CAMERA_WIDTH;
         }
     };
     auto framerate_callback = [this](const rclcpp::Parameter &p)
@@ -856,7 +372,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_framerate = p.as_int();
-            param_change = true;
+            param_change = CAMERA_FRAMERATE;
         }
     };
     auto exp_callback = [this](const rclcpp::Parameter &p)
@@ -874,7 +390,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_exp = p.as_double();
-            param_change = true;
+            param_change = CAMERA_EXP;
         }
     };
     auto gain_callback = [this](const rclcpp::Parameter &p)
@@ -892,7 +408,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_gain = p.as_double();
-            param_change = true;
+            param_change = CAMERA_GAIN;
         }
     };
     auto roi_offset_x_callback = [this](const rclcpp::Parameter &p)
@@ -910,7 +426,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_roi_offset_x = p.as_int();
-            param_change = true;
+            param_change = CAMERA_ROI_OFFSET_X;
         }
     };
     auto roi_offset_y_callback = [this](const rclcpp::Parameter &p)
@@ -928,7 +444,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_roi_offset_y = p.as_int();
-            param_change = true;
+            param_change = CAMERA_ROI_OFFSET_Y;
         }
     };
     auto auto_exp_callback = [this](const rclcpp::Parameter &p)
@@ -946,7 +462,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_auto_exp = p.as_int();
-            param_change = true;
+            param_change = CAMERA_AUTO_EXP;
         }
     };
     auto auto_gain_callback = [this](const rclcpp::Parameter &p)
@@ -964,7 +480,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_auto_gain = p.as_int();
-            param_change = true;
+            param_change = CAMERA_AUTO_GAIN;
         }
     };
     auto auto_whitebalance_callback = [this](const rclcpp::Parameter &p)
@@ -982,7 +498,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_int());
             camera_auto_whitebalance = p.as_int();
-            param_change = true;
+            param_change = CAMERA_AUTO_WHITEBALANCE;
         }
     };
     auto auto_maxexp_callback = [this](const rclcpp::Parameter &p)
@@ -1000,7 +516,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_auto_maxexp = p.as_double();
-            param_change = true;
+            param_change = CAMERA_AUTO_MINEXP;
         }
     };
     auto auto_minexp_callback = [this](const rclcpp::Parameter &p)
@@ -1018,7 +534,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_auto_minexp = p.as_double();
-            param_change = true;
+            param_change = CAMERA_AUTO_MINEXP;
         }
     };
     auto auto_maxgain_callback = [this](const rclcpp::Parameter &p)
@@ -1036,7 +552,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_auto_maxgain = p.as_double();
-            param_change = true;
+            param_change = CAMERA_AUTO_MAXGAIN;
         }
     };
     auto auto_mingain_callback = [this](const rclcpp::Parameter &p)
@@ -1054,7 +570,7 @@ CameraNode::CameraNode(std::string name) : Node(name)
                 p.get_type_name().c_str(),
                 p.as_double());
             camera_auto_mingain = p.as_double();
-            param_change = true;
+            param_change = CAMERA_AUTO_MINGAIN;
         }
     };
     height_cb_handle = height_subscriber->add_parameter_callback("camera_height", height_callback);
