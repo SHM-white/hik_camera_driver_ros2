@@ -62,15 +62,15 @@ int CameraNode::getParam()
     this->declare_parameter("camera_auto_mingain", 0.0);                       /*声明参数*/
     this->get_parameter("camera_auto_mingain", camera_auto_mingain);           /*获取参数*/
     std::vector<double> camera_matrix_vector;
-    this->declare_parameter("camera_matrix", std::vector<double>(9, 0.0)); /*声明参数*/
-    this->get_parameter("camera_matrix", camera_matrix_vector);            /*获取参数*/
+    this->declare_parameter("camera_matrix", std::vector<double>(9, 0.0));     /*声明参数*/
+    this->get_parameter("camera_matrix", camera_matrix_vector);                /*获取参数*/
     for (int i = 0; i < 9; i++)
     {
         camera_matrix[i] = camera_matrix_vector[i];
     }
     std::vector<double> camera_projection_vector;
-    this->declare_parameter("camera_projection", std::vector<double>(12, 0.0)); /*声明参数*/
-    this->get_parameter("camera_projection", camera_projection_vector);         /*获取参数*/
+    this->declare_parameter("camera_projection", std::vector<double>(12, 0.0));/*声明参数*/
+    this->get_parameter("camera_projection", camera_projection_vector);        /*获取参数*/
     for (int i = 0; i < 12; i++)
     {
         camera_projection[i] = camera_projection_vector[i];
@@ -78,8 +78,8 @@ int CameraNode::getParam()
     this->declare_parameter("camera_distortion", std::vector<double>(5, 0.0)); /*声明参数*/
     this->get_parameter("camera_distortion", camera_distortion);               /*获取参数*/
     std::vector<double> camera_rectification_vector;
-    this->declare_parameter("camera_rectification", std::vector<double>(9, 0.0)); /*声明参数*/
-    this->get_parameter("camera_rectification", camera_rectification_vector);     /*获取参数*/
+    this->declare_parameter("camera_rectification", std::vector<double>(9, 0.0));/*声明参数*/
+    this->get_parameter("camera_rectification", camera_rectification_vector);  /*获取参数*/
     for (int i = 0; i < 9; i++)
     {
         camera_rectification[i] = camera_rectification_vector[i];
@@ -270,16 +270,34 @@ int CameraNode::publish_message()
     image_header.stamp = camera_time_ros;                       // 时间戳的零点为相机上电时间
     image_header.stamp = camera_time_ros;
     image_header.frame_id = "hik_camera";
-    image_msg.height = stOutFrame.stFrameInfo.nHeight;
-    image_msg.width = stOutFrame.stFrameInfo.nWidth;
+    // image_msg.height = stOutFrame.stFrameInfo.nHeight;
+    // image_msg.width = stOutFrame.stFrameInfo.nWidth;
+    // image_msg.encoding = "bgr8";
+    // image_msg.header = image_header;
+    // image_msg.step = stOutFrame.stFrameInfo.nWidth * 3;
+    // image_msg.data = std::vector<unsigned char>(stOutFrame.pBufAddr, stOutFrame.pBufAddr + stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3);
+    // image_pub->publish(image_msg);
+    // camera_info_msg.header = image_header;
+    // camera_info_msg.height = stOutFrame.stFrameInfo.nHeight;
+    // camera_info_msg.width = stOutFrame.stFrameInfo.nWidth;
+    // camera_info_msg.distortion_model = "plumb_bob";
+    // camera_info_msg.d = camera_distortion;
+    // camera_info_msg.k = camera_matrix;
+    // camera_info_msg.r = camera_rectification;
+    // camera_info_msg.p = camera_projection;
+    // camera_info_pub->publish(camera_info_msg);
+    cv::Mat frame;
+    cap >> frame;
+    image_msg.height = frame.rows;
+    image_msg.width = frame.cols;
     image_msg.encoding = "bgr8";
     image_msg.header = image_header;
-    image_msg.step = stOutFrame.stFrameInfo.nWidth * 3;
-    image_msg.data = std::vector<unsigned char>(stOutFrame.pBufAddr, stOutFrame.pBufAddr + stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3);
+    image_msg.step = frame.cols * 3;
+    image_msg.data = std::vector<unsigned char>(frame.data, frame.data + frame.cols * frame.rows * 3);
     image_pub->publish(image_msg);
     camera_info_msg.header = image_header;
-    camera_info_msg.height = stOutFrame.stFrameInfo.nHeight;
-    camera_info_msg.width = stOutFrame.stFrameInfo.nWidth;
+    camera_info_msg.height = frame.rows;
+    camera_info_msg.width = frame.cols;
     camera_info_msg.distortion_model = "plumb_bob";
     camera_info_msg.d = camera_distortion;
     camera_info_msg.k = camera_matrix;
@@ -303,10 +321,14 @@ CameraNode::CameraNode(std::string name) : Node(name)
 {
     // 打印一句
     RCLCPP_INFO(this->get_logger(), "%s节点已经启动.", name.c_str());
+    cap.open(0);
     yaml_config = YAML::LoadFile(std::string(ROOT_DIR) + std::string("yaml/camera.yaml"));
     image_pub = this->create_publisher<sensor_msgs::msg::Image>("image_raw", 10);
     camera_info_pub = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);
+    set_camera_info_srv = this->create_service<sensor_msgs::srv::SetCameraInfo>("/camera/set_camera_info", std::bind(&CameraNode::set_camera_info_callback, this, std::placeholders::_1, std::placeholders::_2));
     memset(&stOutFrame, 0, sizeof(MV_FRAME_OUT));
+    camera_namespace = this->get_namespace();
+    camera_namespace.erase(0,1);
     height_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
     width_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
     framerate_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);
@@ -588,4 +610,59 @@ CameraNode::CameraNode(std::string name) : Node(name)
     auto_maxgain_cb_handle = auto_maxgain_subscriber->add_parameter_callback("camera_auto_maxgain", auto_maxgain_callback);
     auto_mingain_cb_handle = auto_mingain_subscriber->add_parameter_callback("camera_auto_mingain", auto_mingain_callback);
     getParam();
+}
+void CameraNode::set_camera_info_callback(const std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Request> request, std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Response> response)
+{
+    RCLCPP_INFO(this->get_logger(), "Received a request on topic \"%s\"", "set_camera_info");
+    response->success = true;
+    response->status_message = "success";
+    camera_distortion = request->camera_info.d;
+    camera_matrix = request->camera_info.k;
+    camera_rectification = request->camera_info.r;
+    camera_projection = request->camera_info.p;
+    for(int i=0;i<9;i++)
+    {
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_matrix"][i] = camera_matrix[i];
+        std::string astring = yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_matrix"][i].as<std::string>();
+        if(astring.find(".") == std::string::npos)
+        {
+            astring += ".0";
+        }
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_matrix"][i] = astring;
+    }
+    for(int i=0;i<5;i++)
+    {
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_distortion"][i] = camera_distortion[i];
+        std::string astring = yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_distortion"][i].as<std::string>();
+        if(astring.find(".") == std::string::npos)
+        {
+            astring += ".0";
+        }
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_distortion"][i] = astring;
+    }
+    for(int i=0;i<9;i++)
+    {
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_rectification"][i] = camera_rectification[i];
+        std::string astring = yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_rectification"][i].as<std::string>();
+        if(astring.find(".") == std::string::npos)
+        {
+            astring += ".0";
+        }
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_rectification"][i] = astring;
+    }
+    for(int i=0;i<12;i++)
+    {
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_projection"][i] = camera_projection[i];
+        std::string astring = yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_projection"][i].as<std::string>();
+        if(astring.find(".") == std::string::npos)
+        {
+            astring += ".0";
+        }
+        yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_projection"][i] = astring;
+    }
+    std::ofstream yaml_out;
+    yaml_out.open(std::string(ROOT_DIR) + std::string("yaml/camera.yaml"));
+    yaml_out << yaml_config;
+    yaml_out.close();
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%ld]", (long int)response->success);
 }

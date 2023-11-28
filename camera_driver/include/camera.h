@@ -12,6 +12,7 @@
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <sensor_msgs/srv/set_camera_info.hpp>
 #include <yaml-cpp/yaml.h>
+#include <fstream>
 // Define the CameraNode class
 /*
     创建一个类节点，名字叫做CameraNode,继承自Node.
@@ -94,13 +95,18 @@ public:
     CameraNode(std::string name);
     int restart_flag = 10;
     CameraParams param_change = NONE;
+    YAML::Node yaml_config;
+    std::string camera_namespace; 
 private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub;
+    cv::VideoCapture cap;
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub;
+    rclcpp::Service<sensor_msgs::srv::SetCameraInfo>::SharedPtr set_camera_info_srv;
+    void set_camera_info_callback(const std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Request> request,
+                            std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Response> response);
     std_msgs::msg::Header image_header;
     sensor_msgs::msg::Image image_msg;
     sensor_msgs::msg::CameraInfo camera_info_msg;
-    YAML::Node yaml_config;
     int camera_height = 1080;
     int camera_width = 1440;
     int camera_framerate = 200;

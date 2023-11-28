@@ -94,7 +94,7 @@ int main(int argc, char **argv)
                 node->getAndSetCameraParam(node->param_change);
                 node->start_grabbing();
                 node->param_change = NONE;
-            }  
+            } 
             loop_rate.sleep();
         }
         // ch:停止取流 | en:Stop grab image
