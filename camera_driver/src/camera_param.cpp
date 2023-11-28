@@ -650,3 +650,73 @@ int CameraNode::getAndSetCameraParam(CameraParams which_param)
     }
     return nRet;
 }
+void CameraNode::param_event_callback(const std::shared_ptr<camera_interfaces::srv::ParamEvent::Request> request, std::shared_ptr<camera_interfaces::srv::ParamEvent::Response> response)
+{
+    RCLCPP_INFO(this->get_logger(), "Received a request on topic \"%s\"", "param_event");
+    switch (request->param_name)
+    {
+    case CAMERA_HEIGHT:
+        camera_height = request->value;
+        param_change = CAMERA_HEIGHT;
+        break;
+    case CAMERA_WIDTH:
+        camera_width = request->value;
+        param_change = CAMERA_WIDTH;
+        break;
+    case CAMERA_FRAMERATE:
+        camera_framerate = request->value;
+        param_change = CAMERA_FRAMERATE;
+        break;
+    case CAMERA_EXP:
+        camera_exp = request->value;
+        param_change = CAMERA_EXP;
+        break;
+    case CAMERA_GAIN:
+        camera_gain = request->value;
+        param_change = CAMERA_GAIN;
+        break;
+    case CAMERA_ROI_OFFSET_X:
+        camera_roi_offset_x = request->value;
+        param_change = CAMERA_ROI_OFFSET_X;
+        break;
+    case CAMERA_ROI_OFFSET_Y:
+        camera_roi_offset_y = request->value;
+        param_change = CAMERA_ROI_OFFSET_Y;
+        break;
+    case CAMERA_AUTO_EXP:
+        camera_auto_exp = request->value;
+        param_change = CAMERA_AUTO_EXP;
+        break;
+    case CAMERA_AUTO_GAIN:
+        camera_auto_gain = request->value;
+        param_change = CAMERA_AUTO_GAIN;
+        break;
+    case CAMERA_AUTO_WHITEBALANCE:
+        camera_auto_whitebalance = request->value;
+        param_change = CAMERA_AUTO_WHITEBALANCE;
+        break;
+    case CAMERA_AUTO_MAXEXP:
+        camera_auto_maxexp = request->value;
+        param_change = CAMERA_AUTO_MAXEXP;
+        break;
+    case CAMERA_AUTO_MINEXP:
+        camera_auto_minexp = request->value;
+        param_change = CAMERA_AUTO_MINEXP;
+        break;
+    case CAMERA_AUTO_MAXGAIN:
+        camera_auto_maxgain = request->value;
+        param_change = CAMERA_AUTO_MAXGAIN;
+        break;
+    case CAMERA_AUTO_MINGAIN:
+        camera_auto_mingain = request->value;
+        param_change = CAMERA_AUTO_MINGAIN;
+        break;
+    default:
+        response->success = false;
+        response->status_message = "failed";
+        break;
+    }
+    response->success = true;
+    response->status_message = "success";
+    RCLCPP_INFO(this->get_logger(), "Sending back response: [%ld]", (long int)response->success);
+}

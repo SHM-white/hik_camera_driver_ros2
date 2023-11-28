@@ -13,6 +13,7 @@
 #include <sensor_msgs/srv/set_camera_info.hpp>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
+#include "camera_interfaces/srv/param_event.hpp"
 // Define the CameraNode class
 /*
     创建一个类节点，名字叫做CameraNode,继承自Node.
@@ -99,11 +100,13 @@ public:
     std::string camera_namespace; 
 private:
     rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub;
-    cv::VideoCapture cap;
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub;
     rclcpp::Service<sensor_msgs::srv::SetCameraInfo>::SharedPtr set_camera_info_srv;
+    rclcpp::Service<camera_interfaces::srv::ParamEvent>::SharedPtr param_event_srv;
     void set_camera_info_callback(const std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Request> request,
                             std::shared_ptr<sensor_msgs::srv::SetCameraInfo::Response> response);
+    void param_event_callback(const std::shared_ptr<camera_interfaces::srv::ParamEvent::Request> request,
+                            std::shared_ptr<camera_interfaces::srv::ParamEvent::Response> response);
     std_msgs::msg::Header image_header;
     sensor_msgs::msg::Image image_msg;
     sensor_msgs::msg::CameraInfo camera_info_msg;
@@ -132,34 +135,6 @@ private:
     MV_CC_DEVICE_INFO_LIST stDeviceList;
     MVCC_INTVALUE stParam;
     MV_FRAME_OUT stOutFrame = {0};
-    std::shared_ptr<rclcpp::ParameterEventHandler> height_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> height_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> width_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> width_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> framerate_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> framerate_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> exp_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> exp_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> gain_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> gain_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> roi_offset_x_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> roi_offset_x_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> roi_offset_y_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> roi_offset_y_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_exp_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_exp_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_gain_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_gain_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_whitebalance_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_whitebalance_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_maxexp_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_maxexp_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_minexp_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_minexp_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_maxgain_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_maxgain_cb_handle;
-    std::shared_ptr<rclcpp::ParameterEventHandler> auto_mingain_subscriber;
-    std::shared_ptr<rclcpp::ParameterCallbackHandle> auto_mingain_cb_handle;
 };
 
 #endif // CAMERA_H
