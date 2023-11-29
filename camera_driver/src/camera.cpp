@@ -303,7 +303,6 @@ CameraNode::CameraNode(std::string name) : Node(name)
 {
     // 打印一句
     RCLCPP_INFO(this->get_logger(), "%s节点已经启动.", name.c_str());
-    yaml_config = YAML::LoadFile(std::string(ROOT_DIR) + std::string("yaml/camera.yaml"));
     image_pub = this->create_publisher<sensor_msgs::msg::Image>("image_raw", 10);
     camera_info_pub = this->create_publisher<sensor_msgs::msg::CameraInfo>("camera_info", 10);
     set_camera_info_srv = this->create_service<sensor_msgs::srv::SetCameraInfo>("/camera/set_camera_info", std::bind(&CameraNode::set_camera_info_callback, this, std::placeholders::_1, std::placeholders::_2));
@@ -322,6 +321,7 @@ void CameraNode::set_camera_info_callback(const std::shared_ptr<sensor_msgs::srv
     camera_matrix = request->camera_info.k;
     camera_rectification = request->camera_info.r;
     camera_projection = request->camera_info.p;
+    yaml_config = YAML::LoadFile(std::string(ROOT_DIR) + std::string("yaml/camera.yaml"));
     for(int i=0;i<9;i++)
     {
         yaml_config[camera_namespace]["camera_driver_node"]["ros__parameters"]["camera_matrix"][i] = camera_matrix[i];

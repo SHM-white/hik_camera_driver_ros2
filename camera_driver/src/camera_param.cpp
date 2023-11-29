@@ -39,6 +39,7 @@ int CameraNode::getAndSetCameraHeight()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_height", camera_height));
     return state;
 }
 int CameraNode::getAndSetCameraWidth()
@@ -81,10 +82,12 @@ int CameraNode::getAndSetCameraWidth()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_width", camera_width));
     return state;
 }
 int CameraNode::getAndSetCameraFramerate()
 {
+    this->set_parameter(rclcpp::Parameter("camera_framerate", camera_framerate));
     return MV_OK;
 }
 int CameraNode::getAndSetCameraRoiOffsetX()
@@ -127,6 +130,7 @@ int CameraNode::getAndSetCameraRoiOffsetX()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_roi_offset_x", camera_roi_offset_x));
     return state;
 }
 int CameraNode::getAndSetCameraRoiOffsetY()
@@ -169,6 +173,7 @@ int CameraNode::getAndSetCameraRoiOffsetY()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_roi_offset_y", camera_roi_offset_y));
     return state;
 }
 int CameraNode::getAndSetCameraAutoExp()
@@ -205,6 +210,7 @@ int CameraNode::getAndSetCameraAutoExp()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_exp", camera_auto_exp));
     return state;
 }
 int CameraNode::getAndSetCameraAutoGain()
@@ -241,6 +247,7 @@ int CameraNode::getAndSetCameraAutoGain()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_gain", camera_auto_gain));
     return state;
 }
 int CameraNode::getAndSetCameraAutoWhitebalance()
@@ -277,6 +284,7 @@ int CameraNode::getAndSetCameraAutoWhitebalance()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_whitebalance", camera_auto_whitebalance));
     return state;
 }
 int CameraNode::getAndSetCameraPixelFormat()
@@ -351,6 +359,7 @@ int CameraNode::getAndSetCameraExp()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_exp", camera_exp));
     return state;
 }
 int CameraNode::getAndSetCameraGain()
@@ -393,6 +402,7 @@ int CameraNode::getAndSetCameraGain()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_gain", camera_gain));
     return state;
 }
 int CameraNode::getAndSetCameraAutoMinexp()
@@ -435,6 +445,7 @@ int CameraNode::getAndSetCameraAutoMinexp()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_minexp", camera_auto_minexp));
     return state;
 }
 int CameraNode::getAndSetCameraAutoMaxexp()
@@ -477,6 +488,7 @@ int CameraNode::getAndSetCameraAutoMaxexp()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_maxexp", camera_auto_maxexp));
     return state;
 }
 int CameraNode::getAndSetCameraAutoMaxgain()
@@ -519,6 +531,7 @@ int CameraNode::getAndSetCameraAutoMaxgain()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_maxgain", camera_auto_maxgain));
     return state;
 }
 int CameraNode::getAndSetCameraAutoMingain()
@@ -561,6 +574,7 @@ int CameraNode::getAndSetCameraAutoMingain()
             state = -1;
         }
     }
+    this->set_parameter(rclcpp::Parameter("camera_auto_mingain", camera_auto_mingain));
     return state;
 }
 // 从相机内部获取参数，如果与要求不一致，则进行修改
@@ -711,6 +725,8 @@ void CameraNode::param_event_callback(const std::shared_ptr<camera_interfaces::s
         camera_auto_mingain = request->value;
         param_change = CAMERA_AUTO_MINGAIN;
         break;
+    case NONE:
+        break;
     default:
         response->success = false;
         response->status_message = "failed";
@@ -718,5 +734,19 @@ void CameraNode::param_event_callback(const std::shared_ptr<camera_interfaces::s
     }
     response->success = true;
     response->status_message = "success";
+    response->camera_auto_exp = camera_auto_exp;
+    response->camera_auto_gain = camera_auto_gain;
+    response->camera_auto_maxexp = camera_auto_maxexp;
+    response->camera_auto_maxgain = camera_auto_maxgain;
+    response->camera_auto_minexp = camera_auto_minexp;
+    response->camera_auto_mingain = camera_auto_mingain;
+    response->camera_auto_whitebalance = camera_auto_whitebalance;
+    response->camera_exp = camera_exp;
+    response->camera_framerate = camera_framerate;
+    response->camera_gain = camera_gain;
+    response->camera_height = camera_height;
+    response->camera_roi_offset_x = camera_roi_offset_x;
+    response->camera_roi_offset_y = camera_roi_offset_y;
+    response->camera_width = camera_width;
     RCLCPP_INFO(this->get_logger(), "Sending back response: [%ld]", (long int)response->success);
 }

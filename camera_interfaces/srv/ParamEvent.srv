@@ -12,8 +12,23 @@ int8 CAMERA_AUTO_MAXGAIN = 11
 int8 CAMERA_AUTO_MINGAIN = 12
 int8 CAMERA_EXP = 13
 int8 CAMERA_GAIN = 14
+int8 CHECK = 15
 int8 param_name
 float64 value
 ---
 bool success
 string status_message
+int32 camera_height
+int32 camera_width
+float64 camera_exp
+float64 camera_gain
+int32 camera_framerate
+int32 camera_roi_offset_x
+int32 camera_roi_offset_y
+int32 camera_auto_exp
+int32 camera_auto_maxexp
+int32 camera_auto_minexp
+int32 camera_auto_gain
+float64 camera_auto_maxgain
+float64 camera_auto_mingain
+int32 camera_auto_whitebalance
