@@ -272,7 +272,7 @@ int CameraNode::publish_message()
     image_header.frame_id = "hik_camera";
     image_msg.height = stOutFrame.stFrameInfo.nHeight;
     image_msg.width = stOutFrame.stFrameInfo.nWidth;
-    image_msg.encoding = "bgr8";
+    image_msg.encoding = "rgb8";
     image_msg.header = image_header;
     image_msg.step = stOutFrame.stFrameInfo.nWidth * 3;
     image_msg.data = std::vector<unsigned char>(stOutFrame.pBufAddr, stOutFrame.pBufAddr + stOutFrame.stFrameInfo.nWidth * stOutFrame.stFrameInfo.nHeight * 3);
