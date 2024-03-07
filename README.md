@@ -62,17 +62,9 @@ ROS2下的海康相机驱动
 
 `cd ..`
 
-先编译接口包，因为节点包依赖于接口包
+`colcon build --symlink-install`
 
-`colcon build --packages-select camera_interfaces --symlink-install`
-
->`--packages-select`参数的作用：编译指定包，`--symlink-install`参数的作用：编译时如果install中的文件已经存在于src或者build文件夹中，就用超链接指向该文件，实现同步更新（修改yaml和launch文件后无需编译），也避免浪费空间。
-
-再编译相机驱动节点，先source是为了相机节点包能够找到接口包
-
-`source install/setup.bash`
-
-`colcon build --packages-select camera_driver --symlink-install`
+>`--symlink-install`参数的作用：编译时如果install中的文件已经存在于src或者build文件夹中，就用超链接指向该文件，实现同步更新（修改yaml和launch文件后无需编译），也避免浪费空间。
 
 ### 参数文件camera.yaml说明
 
