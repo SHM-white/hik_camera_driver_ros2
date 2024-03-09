@@ -84,6 +84,7 @@ int CameraNode::getParam()
     {
         camera_rectification[i] = camera_rectification_vector[i];
     }
+    return MV_OK;
 }
 // 枚举相机
 int CameraNode::enum_devices()
